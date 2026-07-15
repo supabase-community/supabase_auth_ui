@@ -45,6 +45,53 @@ void main() {
     );
   });
 
+  testWidgets('uses 16 logical pixels of spacing by default', (tester) async {
+    await tester.pumpWidget(
+      wrapForTest(
+        SupaSocialsAuth(
+          socialProviders: const [
+            OAuthProvider.github,
+            OAuthProvider.google,
+          ],
+          onSuccess: (_) {},
+        ),
+      ),
+    );
+
+    final column = tester.widget<Column>(
+      find.descendant(
+        of: find.byType(SupaSocialsAuth),
+        matching: find.byType(Column),
+      ),
+    );
+
+    expect(column.spacing, 16.0);
+  });
+
+  testWidgets('applies custom spacing in iconAndText mode', (tester) async {
+    await tester.pumpWidget(
+      wrapForTest(
+        SupaSocialsAuth(
+          socialProviders: const [
+            OAuthProvider.github,
+            OAuthProvider.google,
+          ],
+          spacing: 24,
+          onSuccess: (_) {},
+        ),
+      ),
+    );
+
+    final column = tester.widget<Column>(
+      find.descendant(
+        of: find.byType(SupaSocialsAuth),
+        matching: find.byType(Column),
+      ),
+    );
+
+    expect(column.spacing, 24.0);
+  });
+
   testWidgets('renders icon-only buttons without labels in icon mode', (
     tester,
   ) async {
@@ -64,6 +111,32 @@ void main() {
       findsNothing,
     );
     expect(find.byType(InkResponse), findsOneWidget);
+  });
+
+  testWidgets('applies custom spacing in icon mode', (tester) async {
+    await tester.pumpWidget(
+      wrapForTest(
+        SupaSocialsAuth(
+          socialProviders: const [
+            OAuthProvider.github,
+            OAuthProvider.google,
+          ],
+          socialButtonVariant: SocialButtonVariant.icon,
+          spacing: 24,
+          onSuccess: (_) {},
+        ),
+      ),
+    );
+
+    final wrap = tester.widget<Wrap>(
+      find.descendant(
+        of: find.byType(SupaSocialsAuth),
+        matching: find.byType(Wrap),
+      ),
+    );
+
+    expect(wrap.spacing, 24.0);
+    expect(wrap.runSpacing, 24.0);
   });
 
   testWidgets('uses a custom label from oAuthButtonLabels when provided', (

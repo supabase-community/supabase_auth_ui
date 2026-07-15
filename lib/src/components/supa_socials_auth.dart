@@ -120,6 +120,13 @@ class SupaSocialsAuth extends StatefulWidget {
   /// Whether or not to show the icon only or icon and text
   final SocialButtonVariant socialButtonVariant;
 
+  /// The spacing between social login buttons.
+  ///
+  /// In [SocialButtonVariant.icon] mode, this is applied between buttons and
+  /// wrapped rows. In [SocialButtonVariant.iconAndText] mode, this is applied
+  /// vertically between buttons.
+  final double spacing;
+
   /// `redirectUrl` to be passed to the `.signIn()` or `signUp()` methods
   ///
   /// Typically used to pass a DeepLink
@@ -175,6 +182,7 @@ class SupaSocialsAuth extends StatefulWidget {
     required this.onSuccess,
     this.onError,
     this.socialButtonVariant = SocialButtonVariant.iconAndText,
+    this.spacing = 16.0,
     this.showSnackBars = true,
     this.showSuccessSnackBar = true,
     this.scopes,
@@ -420,7 +428,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
         );
 
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: widget.socialButtonVariant == SocialButtonVariant.icon
               ? Material(
                   shape: const CircleBorder(),
@@ -450,10 +458,13 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
     return widget.socialButtonVariant == SocialButtonVariant.icon
         ? Wrap(
             alignment: WrapAlignment.spaceEvenly,
+            spacing: widget.spacing,
+            runSpacing: widget.spacing,
             children: authButtons,
           )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: widget.spacing,
             children: authButtons,
           );
   }
