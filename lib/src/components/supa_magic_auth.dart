@@ -66,7 +66,7 @@ class _SupaMagicAuthState extends State<SupaMagicAuth> {
   @override
   void dispose() {
     _email.dispose();
-    _gotrueSubscription.cancel();
+    unawaited(_gotrueSubscription.cancel());
     super.dispose();
   }
 
@@ -128,15 +128,15 @@ class _SupaMagicAuthState extends State<SupaMagicAuth> {
               label: Text(localization.enterEmail),
             ),
             controller: _email,
-            onFieldSubmitted: (_) async {
+            onFieldSubmitted: (_) {
               if (widget.enableAutomaticFormSubmission) {
-                await _signInWithMagicLink();
+                unawaited(_signInWithMagicLink());
               }
             },
           ),
           spacer(16),
           ElevatedButton(
-            onPressed: _signInWithMagicLink,
+            onPressed: () => unawaited(_signInWithMagicLink()),
             child: (_isLoading)
                 ? SizedBox(
                     height: 16,

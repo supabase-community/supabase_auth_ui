@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -5,12 +7,26 @@ import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 import 'constants.dart';
 
-class SignInPrefilled extends StatelessWidget {
+class SignInPrefilled extends StatefulWidget {
   const SignInPrefilled({super.key});
+
+  @override
+  State<SignInPrefilled> createState() => _SignInPrefilledState();
+}
+
+class _SignInPrefilledState extends State<SignInPrefilled> {
+  final _termsRecognizer = TapGestureRecognizer();
+
+  @override
+  void dispose() {
+    _termsRecognizer.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     void navigateHome(AuthResponse response) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      unawaited(Navigator.of(context).pushReplacementNamed('/home'));
     }
 
     return Scaffold(
@@ -52,7 +68,7 @@ class SignInPrefilled extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.blue,
                     ),
-                    recognizer: TapGestureRecognizer()
+                    recognizer: _termsRecognizer
                       ..onTap = () {
                         // Handle tap on Terms and Conditions
                       },

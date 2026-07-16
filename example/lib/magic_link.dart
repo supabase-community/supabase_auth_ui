@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
@@ -17,7 +19,7 @@ class MagicLink extends StatelessWidget {
           children: [
             SupaMagicAuth(
               onSuccess: (response) {
-                Navigator.of(context).pushReplacementNamed('/home');
+                unawaited(Navigator.of(context).pushReplacementNamed('/home'));
               },
               redirectUrl: kIsWeb
                   ? null
@@ -29,7 +31,7 @@ class MagicLink extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/');
+                unawaited(Navigator.pushNamed(context, '/'));
               },
             ),
           ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
@@ -17,7 +19,7 @@ class PhoneSignIn extends StatelessWidget {
             SupaPhoneAuth(
               authAction: SupaAuthAction.signIn,
               onSuccess: (response) {
-                Navigator.of(context).pushReplacementNamed('/home');
+                unawaited(Navigator.of(context).pushReplacementNamed('/home'));
               },
             ),
             TextButton(
@@ -26,7 +28,7 @@ class PhoneSignIn extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/phone_sign_up');
+                unawaited(Navigator.pushNamed(context, '/phone_sign_up'));
               },
             ),
           ],

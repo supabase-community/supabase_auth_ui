@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/src/l10n/l10n_extension.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
@@ -26,7 +28,7 @@ class SupaVerifyPhone extends StatefulWidget {
 }
 
 class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
-  Map? data;
+  Map<String, dynamic>? data;
   final _formKey = GlobalKey<FormState>();
   final _code = TextEditingController();
 
@@ -36,11 +38,41 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
     super.dispose();
   }
 
+  Future<void> _verifyPhone() async {
+    final localization = context.l10n;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    try {
+      final response = await supabase.auth.verifyOTP(
+        phone: data!['phone'],
+        token: _code.text,
+        type: OtpType.sms,
+      );
+      widget.onSuccess(response);
+    } catch (error) {
+      if (mounted) {
+        handleAuthError(
+          context,
+          error,
+          onError: widget.onError,
+          showSnackBars: widget.showSnackBars,
+          unexpectedErrorText: localization.unexpectedError,
+        );
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _code.text = '';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final localization = context.l10n;
     var args = ModalRoute.of(context)?.settings.arguments;
-    if (args != null) data = args as Map;
+    if (args != null) data = args as Map<String, dynamic>;
     return Form(
       key: _formKey,
       child: Column(
@@ -61,38 +93,11 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
           ),
           spacer(16),
           ElevatedButton(
+            onPressed: () => unawaited(_verifyPhone()),
             child: Text(
               localization.verifyPhone,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            onPressed: () async {
-              if (!_formKey.currentState!.validate()) {
-                return;
-              }
-              try {
-                final response = await supabase.auth.verifyOTP(
-                  phone: data!["phone"],
-                  token: _code.text,
-                  type: OtpType.sms,
-                );
-                widget.onSuccess(response);
-              } catch (error) {
-                if (context.mounted) {
-                  handleAuthError(
-                    context,
-                    error,
-                    onError: widget.onError,
-                    showSnackBars: widget.showSnackBars,
-                    unexpectedErrorText: localization.unexpectedError,
-                  );
-                }
-              }
-              if (mounted) {
-                setState(() {
-                  _code.text = '';
-                });
-              }
-            },
           ),
           spacer(10),
         ],

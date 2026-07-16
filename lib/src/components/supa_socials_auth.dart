@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
@@ -23,10 +22,9 @@ extension on OAuthProvider {
     OAuthProvider.github => FontAwesomeIcons.github,
     OAuthProvider.gitlab => FontAwesomeIcons.gitlab,
     OAuthProvider.google => FontAwesomeIcons.google,
-    OAuthProvider.linkedin => FontAwesomeIcons.linkedin,
+    OAuthProvider.linkedin ||
     OAuthProvider.linkedinOidc => FontAwesomeIcons.linkedin,
-    OAuthProvider.slack => FontAwesomeIcons.slack,
-    OAuthProvider.slackOidc => FontAwesomeIcons.slack,
+    OAuthProvider.slack || OAuthProvider.slackOidc => FontAwesomeIcons.slack,
     OAuthProvider.spotify => FontAwesomeIcons.spotify,
     OAuthProvider.twitch => FontAwesomeIcons.twitch,
     OAuthProvider.twitter => FontAwesomeIcons.xTwitter,
@@ -34,27 +32,24 @@ extension on OAuthProvider {
   };
 
   Color get btnBgColor => switch (this) {
-    OAuthProvider.apple => Colors.black,
     OAuthProvider.azure => Colors.blueAccent,
     OAuthProvider.bitbucket => Colors.blue,
     OAuthProvider.discord => Colors.purple,
     OAuthProvider.facebook => const Color(0xFF3b5998),
     OAuthProvider.figma => const Color.fromRGBO(241, 77, 27, 1),
-    OAuthProvider.github => Colors.black,
     OAuthProvider.gitlab => Colors.deepOrange,
     OAuthProvider.google => Colors.white,
     OAuthProvider.kakao => const Color(0xFFFFE812),
     OAuthProvider.keycloak => const Color.fromRGBO(0, 138, 170, 1),
-    OAuthProvider.linkedin => const Color.fromRGBO(0, 136, 209, 1),
+    OAuthProvider.linkedin ||
     OAuthProvider.linkedinOidc => const Color.fromRGBO(0, 136, 209, 1),
     OAuthProvider.notion => const Color.fromRGBO(69, 75, 78, 1),
-    OAuthProvider.slack => const Color.fromRGBO(74, 21, 75, 1),
+    OAuthProvider.slack ||
     OAuthProvider.slackOidc => const Color.fromRGBO(74, 21, 75, 1),
     OAuthProvider.spotify => Colors.green,
     OAuthProvider.twitch => Colors.purpleAccent,
-    OAuthProvider.twitter => Colors.black,
     OAuthProvider.workos => const Color.fromRGBO(99, 99, 241, 1),
-    OAuthProvider() => Colors.black,
+    _ => Colors.black,
   };
 
   /// Human readable provider name, e.g. `Github` or `Linkedin`, used to build
@@ -256,8 +251,8 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
       await supabase.auth.updateUser(
         UserAttributes(
           data: {
-            if (givenName != null) 'first_name': givenName,
-            if (familyName != null) 'last_name': familyName,
+            'first_name': ?givenName,
+            'last_name': ?familyName,
             if (fullName.isNotEmpty) 'full_name': fullName,
           },
         ),
@@ -281,7 +276,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
               session != null &&
               mounted &&
               session.user.isAnonymous != true) {
-            widget.onSuccess.call(session);
+            widget.onSuccess(session);
             if (widget.showSnackBars && widget.showSuccessSnackBar) {
               context.showSnackBar(context.l10n.successSignInMessage);
             }
@@ -291,7 +286,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
 
   @override
   void dispose() {
-    _gotrueSubscription.cancel();
+    unawaited(_gotrueSubscription.cancel());
     super.dispose();
   }
 
@@ -333,6 +328,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
           iconWidget = Image.asset(
             logoAsset,
             package: 'supabase_auth_ui',
+            semanticLabel: socialProvider.displayName,
             color: socialProvider == OAuthProvider.workos && coloredBg
                 ? Colors.white
                 : null,
@@ -344,6 +340,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
           iconWidget = Image.asset(
             'assets/logos/google_light.png',
             package: 'supabase_auth_ui',
+            semanticLabel: socialProvider.displayName,
             width: 48,
             height: 48,
           );
@@ -352,15 +349,19 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
           overlayColor = Colors.white;
         }
 
-        onAuthButtonPressed() async {
+        Future<void> onAuthButtonPressed() async {
           try {
             // Check if native Google login should be performed
             if (socialProvider == OAuthProvider.google) {
               final webClientId = googleAuthConfig?.webClientId;
               final iosClientId = googleAuthConfig?.iosClientId;
               final shouldPerformNativeGoogleSignIn =
-                  (webClientId != null && !kIsWeb && Platform.isAndroid) ||
-                  (iosClientId != null && !kIsWeb && Platform.isIOS);
+                  (webClientId != null &&
+                      !kIsWeb &&
+                      defaultTargetPlatform == TargetPlatform.android) ||
+                  (iosClientId != null &&
+                      !kIsWeb &&
+                      defaultTargetPlatform == TargetPlatform.iOS);
               if (shouldPerformNativeGoogleSignIn) {
                 await _nativeGoogleSignIn(
                   webClientId: webClientId,
@@ -373,8 +374,10 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
             // Check if native Apple login should be performed
             if (socialProvider == OAuthProvider.apple) {
               final shouldPerformNativeAppleSignIn =
-                  (isNativeAppleAuthEnabled && !kIsWeb && Platform.isIOS) ||
-                  (isNativeAppleAuthEnabled && !kIsWeb && Platform.isMacOS);
+                  isNativeAppleAuthEnabled &&
+                  !kIsWeb &&
+                  (defaultTargetPlatform == TargetPlatform.iOS ||
+                      defaultTargetPlatform == TargetPlatform.macOS);
               if (shouldPerformNativeAppleSignIn) {
                 await _nativeAppleSignIn();
                 return;
@@ -428,14 +431,14 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
                   color: backgroundColor,
                   child: InkResponse(
                     radius: 24,
-                    onTap: onAuthButtonPressed,
+                    onTap: () => unawaited(onAuthButtonPressed()),
                     child: iconWidget,
                   ),
                 )
               : ElevatedButton.icon(
                   icon: iconWidget,
                   style: authButtonStyle,
-                  onPressed: onAuthButtonPressed,
+                  onPressed: () => unawaited(onAuthButtonPressed()),
                   label: Text(
                     widget.oAuthButtonLabels?[socialProvider] ??
                         localization.continueWithProvider(
