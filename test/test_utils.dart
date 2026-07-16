@@ -101,7 +101,7 @@ http.Response errorResponse(
 }) => http.Response(
   jsonEncode({
     'message': message,
-    if (code != null) 'error_code': code,
+    'error_code': ?code,
   }),
   statusCode,
   headers: {'content-type': 'application/json'},

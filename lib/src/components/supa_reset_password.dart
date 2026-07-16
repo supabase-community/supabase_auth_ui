@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/src/components/supa_password_field.dart';
 import 'package:supabase_auth_ui/src/l10n/l10n_extension.dart';
@@ -59,7 +61,7 @@ class _SupaResetPasswordState extends State<SupaResetPassword> {
       final response = await supabase.auth.updateUser(
         UserAttributes(password: _password.text),
       );
-      widget.onSuccess.call(response);
+      widget.onSuccess(response);
       // FIX use_build_context_synchronously
       if (!mounted) return;
       if (widget.showSnackBars) {
@@ -93,15 +95,15 @@ class _SupaResetPasswordState extends State<SupaResetPassword> {
             validator: defaultPasswordValidator(
               localization.passwordLengthError,
             ),
-            onFieldSubmitted: (_) async {
+            onFieldSubmitted: (_) {
               if (widget.enableAutomaticFormSubmission) {
-                await _updatePassword();
+                unawaited(_updatePassword());
               }
             },
           ),
           spacer(16),
           ElevatedButton(
-            onPressed: _updatePassword,
+            onPressed: () => unawaited(_updatePassword()),
             child: Text(
               localization.updatePassword,
               style: const TextStyle(fontWeight: FontWeight.bold),

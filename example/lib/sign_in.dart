@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -5,12 +7,28 @@ import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 import 'constants.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   const SignUp({super.key});
+
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  final _termsRecognizer = TapGestureRecognizer();
+  final _termsRecognizerDark = TapGestureRecognizer();
+
+  @override
+  void dispose() {
+    _termsRecognizer.dispose();
+    _termsRecognizerDark.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     void navigateHome(AuthResponse response) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      unawaited(Navigator.of(context).pushReplacementNamed('/home'));
     }
 
     final darkModeThemeData = ThemeData.dark().copyWith(
@@ -89,7 +107,7 @@ class SignUp extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.blue,
                     ),
-                    recognizer: TapGestureRecognizer()
+                    recognizer: _termsRecognizer
                       ..onTap = () {
                         // Handle tap on Terms and Conditions
                       },
@@ -146,7 +164,7 @@ class SignUp extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.blue,
                           ),
-                          recognizer: TapGestureRecognizer()
+                          recognizer: _termsRecognizerDark
                             ..onTap = () {
                               //ignore: avoid_print
                               print('Terms and Conditions');
@@ -166,14 +184,14 @@ class SignUp extends StatelessWidget {
           ElevatedButton.icon(
             icon: const Icon(Icons.email),
             onPressed: () {
-              Navigator.popAndPushNamed(context, '/magic_link');
+              unawaited(Navigator.popAndPushNamed(context, '/magic_link'));
             },
             label: const Text('Sign in with Magic Link'),
           ),
           spacer,
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.popAndPushNamed(context, '/phone_sign_in');
+              unawaited(Navigator.popAndPushNamed(context, '/phone_sign_in'));
             },
             icon: const Icon(Icons.phone),
             label: const Text('Sign in with Phone'),
@@ -181,7 +199,7 @@ class SignUp extends StatelessWidget {
           spacer,
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.pushNamed(context, '/prefilled');
+              unawaited(Navigator.pushNamed(context, '/prefilled'));
             },
             icon: const Icon(Icons.edit),
             label: const Text('Sign in with prefilled fields'),
@@ -189,7 +207,7 @@ class SignUp extends StatelessWidget {
           spacer,
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.pushNamed(context, '/update_password');
+              unawaited(Navigator.pushNamed(context, '/update_password'));
             },
             icon: const Icon(Icons.lock_reset),
             label: const Text('Update password'),
@@ -204,7 +222,7 @@ class SignUp extends StatelessWidget {
             enableNativeAppleAuth: false,
             socialProviders: OAuthProvider.values,
             onSuccess: (session) {
-              Navigator.of(context).pushReplacementNamed('/home');
+              unawaited(Navigator.of(context).pushReplacementNamed('/home'));
             },
           ),
         ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/src/components/supa_password_field.dart';
 import 'package:supabase_auth_ui/src/l10n/l10n_extension.dart';
@@ -133,15 +135,15 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               validator: defaultPasswordValidator(
                 localization.passwordLengthError,
               ),
-              onFieldSubmitted: (_) async {
+              onFieldSubmitted: (_) {
                 if (widget.enableAutomaticFormSubmission) {
-                  await _submitForm();
+                  unawaited(_submitForm());
                 }
               },
             ),
             spacer(16),
             ElevatedButton(
-              onPressed: _submitForm,
+              onPressed: () => unawaited(_submitForm()),
               child: Text(
                 isSigningIn ? localization.signIn : localization.signUp,
                 style: const TextStyle(fontWeight: FontWeight.bold),

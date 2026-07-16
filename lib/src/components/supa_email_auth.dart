@@ -35,7 +35,7 @@ class MetaDataField {
   final Icon? prefixIcon;
 
   /// {@macro metadata_field}
-  MetaDataField({
+  const MetaDataField({
     required this.label,
     required this.key,
     this.validator,
@@ -318,6 +318,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
           metadataField.key,
           metadataField is BooleanMetaDataField
               ? metadataField.value
+              // ignore: avoid-undisposed-instances, disposed in dispose()
               : TextEditingController(),
         ),
       ),
@@ -332,6 +333,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
     _otpController.dispose();
     _newPasswordController.dispose();
     _confirmNewPasswordController.dispose();
+    _emailFocusNode.dispose();
     for (final controller in _metadataControllers.values) {
       if (controller is TextEditingController) {
         controller.dispose();
@@ -416,9 +418,9 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                 ),
               ],
               spacer(16),
-              if (widget.metadataFields != null && !_isSigningIn)
-                ...widget.metadataFields!
-                    .map(
+              if (!_isSigningIn)
+                ...?widget.metadataFields
+                    ?.map(
                       (metadataField) => [
                         // Render a Checkbox that displays an error message
                         // beneath it if the field is required and the user
@@ -530,7 +532,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                       ),
               ),
               spacer(16),
-              if (_isSigningIn) ...[
+              if (_isSigningIn)
                 TextButton(
                   onPressed: () {
                     setState(() {
@@ -540,7 +542,6 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                   },
                   child: Text(localization.forgotPassword),
                 ),
-              ],
               TextButton(
                 key: const ValueKey('toggleSignInButton'),
                 onPressed: () {
@@ -560,12 +561,12 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
             ],
             if (_isSigningIn && _isRecoveringPassword) ...[
               spacer(16),
-              if (!_isEnteringOtp) ...[
+              if (!_isEnteringOtp)
                 ElevatedButton(
                   onPressed: _passwordRecovery,
                   child: Text(localization.sendPasswordReset),
-                ),
-              ] else ...[
+                )
+              else ...[
                 TextFormField(
                   controller: _otpController,
                   decoration: InputDecoration(
@@ -656,10 +657,10 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        widget.onSignInComplete.call(response);
+        widget.onSignInComplete(response);
       } else {
         final user = supabase.auth.currentUser;
-        late final AuthResponse response;
+        final AuthResponse response;
         if (user?.isAnonymous == true) {
           await supabase.auth.updateUser(
             UserAttributes(
@@ -679,7 +680,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
             data: _resolveData(),
           );
         }
-        widget.onSignUpComplete.call(response);
+        widget.onSignUpComplete(response);
       }
     } catch (error) {
       if (mounted) {

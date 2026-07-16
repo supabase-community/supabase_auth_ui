@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
@@ -20,8 +22,8 @@ class Home extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Supabase.instance.client.auth.signOut();
-                Navigator.of(context).pushReplacementNamed('/');
+                unawaited(Supabase.instance.client.auth.signOut());
+                unawaited(Navigator.of(context).pushReplacementNamed('/'));
               },
               child: const Text(
                 'Log Out',

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
@@ -18,7 +20,7 @@ class UpdatePassword extends StatelessWidget {
               accessToken:
                   Supabase.instance.client.auth.currentSession?.accessToken,
               onSuccess: (response) {
-                Navigator.of(context).pushReplacementNamed('/home');
+                unawaited(Navigator.of(context).pushReplacementNamed('/home'));
               },
             ),
             TextButton(
@@ -27,7 +29,7 @@ class UpdatePassword extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/');
+                unawaited(Navigator.pushNamed(context, '/'));
               },
             ),
           ],
