@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-07-16
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`supabase_auth_ui` - `v0.7.0`](#supabase_auth_ui---v070)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `supabase_auth_ui` - `v0.7.0`
+
+ - **REFACTOR**: deduplicate auth error handling and password validation ([#169](https://github.com/supabase-community/supabase_auth_ui/issues/169)).
+ - **FIX**: resolve all flutter analyze and dcm analyze issues ([#177](https://github.com/supabase-community/supabase_auth_ui/issues/177)).
+ - **FIX**(example): repair broken routes and surface all example screens ([#171](https://github.com/supabase-community/supabase_auth_ui/issues/171)).
+ - **FEAT**: add customizable SupaSocialsAuth spacing ([#176](https://github.com/supabase-community/supabase_auth_ui/issues/176)).
+ - **DOCS**: document additional widget options and fix metadata snippet ([#170](https://github.com/supabase-community/supabase_auth_ui/issues/170)).
+ - **BREAKING** **FEAT**: use idiomatic Flutter l10n via gen-l10n ([#174](https://github.com/supabase-community/supabase_auth_ui/issues/174)).
+
+## 0.7.0
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: deduplicate auth error handling and password validation ([#169](https://github.com/supabase-community/supabase_auth_ui/issues/169)).
+ - **FIX**: resolve all flutter analyze and dcm analyze issues ([#177](https://github.com/supabase-community/supabase_auth_ui/issues/177)).
+ - **FIX**(example): repair broken routes and surface all example screens ([#171](https://github.com/supabase-community/supabase_auth_ui/issues/171)).
+ - **FEAT**: add customizable SupaSocialsAuth spacing ([#176](https://github.com/supabase-community/supabase_auth_ui/issues/176)).
+ - **DOCS**: document additional widget options and fix metadata snippet ([#170](https://github.com/supabase-community/supabase_auth_ui/issues/170)).
+ - **BREAKING** **FEAT**: use idiomatic Flutter l10n via gen-l10n ([#174](https://github.com/supabase-community/supabase_auth_ui/issues/174)).
+
+
 ## 2026-06-24
 
 ### Changes
