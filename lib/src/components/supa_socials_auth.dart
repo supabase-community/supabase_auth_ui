@@ -405,6 +405,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
                 redirectTo: widget.redirectUrl,
                 scopes: widget.scopes?[socialProvider],
                 queryParams: widget.queryParams?[socialProvider],
+                authScreenLaunchMode: widget.authScreenLaunchMode,
               );
               return;
             }
