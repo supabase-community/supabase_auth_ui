@@ -307,7 +307,13 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
               context.showSnackBar(context.l10n.successSignInMessage);
             }
           }
-        });
+        }, onError: _onAuthStateError);
+  }
+
+  void _onAuthStateError(Object error) {
+    if (mounted) {
+      widget.onError?.call(error);
+    }
   }
 
   @override

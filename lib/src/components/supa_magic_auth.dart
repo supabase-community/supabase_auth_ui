@@ -63,7 +63,13 @@ class _SupaMagicAuthState extends State<SupaMagicAuth> {
               !session.user.isAnonymous) {
             widget.onSuccess(session);
           }
-        });
+        }, onError: _onAuthStateError);
+  }
+
+  void _onAuthStateError(Object error) {
+    if (mounted) {
+      widget.onError?.call(error);
+    }
   }
 
   @override
