@@ -27,7 +27,8 @@ extension on OAuthProvider {
     OAuthProvider.slack || OAuthProvider.slackOidc => FontAwesomeIcons.slack,
     OAuthProvider.spotify => FontAwesomeIcons.spotify,
     OAuthProvider.twitch => FontAwesomeIcons.twitch,
-    OAuthProvider.twitter => FontAwesomeIcons.xTwitter,
+    OAuthProvider.twitter || OAuthProvider.x => FontAwesomeIcons.xTwitter,
+    OAuthProvider.zoom => FontAwesomeIcons.zoom,
     _ => FontAwesomeIcons.xmark,
   };
 
@@ -49,13 +50,16 @@ extension on OAuthProvider {
     OAuthProvider.spotify => Colors.green,
     OAuthProvider.twitch => Colors.purpleAccent,
     OAuthProvider.workos => const Color.fromRGBO(99, 99, 241, 1),
+    OAuthProvider.zoom => const Color(0xFF0B5CFF),
     _ => Colors.black,
   };
 
   /// Human readable provider name, e.g. `Github` or `Linkedin`, used to build
   /// the localized "Continue with ..." button label.
   String get displayName {
-    final modifiedName = name.replaceAll('Oidc', '');
+    final modifiedName = name
+        .replaceFirst('custom:', '')
+        .replaceAll('_oidc', '');
     return '${modifiedName[0].toUpperCase()}${modifiedName.substring(1)}';
   }
 

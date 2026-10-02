@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 import '../test_utils.dart';
@@ -153,5 +154,42 @@ void main() {
     );
 
     expect(find.text('Microsoft (Azure)'), findsOneWidget);
+  });
+
+  testWidgets('labels OIDC and custom providers by their readable name', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      wrapForTest(
+        SupaSocialsAuth(
+          socialProviders: const [
+            OAuthProvider.linkedinOidc,
+            OAuthProvider.slackOidc,
+            OAuthProvider('custom:acme'),
+          ],
+          onSuccess: (_) {},
+        ),
+      ),
+    );
+
+    expect(find.text('Continue with Linkedin'), findsOneWidget);
+    expect(find.text('Continue with Slack'), findsOneWidget);
+    expect(find.text('Continue with Acme'), findsOneWidget);
+  });
+
+  testWidgets('shows the brand icons for X and Zoom', (tester) async {
+    await tester.pumpWidget(
+      wrapForTest(
+        SupaSocialsAuth(
+          socialProviders: const [OAuthProvider.x, OAuthProvider.zoom],
+          onSuccess: (_) {},
+        ),
+      ),
+    );
+
+    final icons = tester
+        .widgetList<FaIcon>(find.byType(FaIcon))
+        .map((icon) => icon.icon);
+    expect(icons, [FontAwesomeIcons.xTwitter.data, FontAwesomeIcons.zoom.data]);
   });
 }
