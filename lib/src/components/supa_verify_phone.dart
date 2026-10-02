@@ -44,10 +44,13 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
       return;
     }
     try {
+      // SupaPhoneAuth adds a phone number to an anonymous user through
+      // updateUser, which sends a phone change code instead of a sign up code.
+      final isAnonymous = supabase.auth.currentUser?.isAnonymous ?? false;
       final response = await supabase.auth.verifyOTP(
         phone: data!['phone'],
         token: _code.text,
-        type: OtpType.sms,
+        type: isAnonymous ? OtpType.phoneChange : OtpType.sms,
       );
       widget.onSuccess(response);
     } catch (error) {
