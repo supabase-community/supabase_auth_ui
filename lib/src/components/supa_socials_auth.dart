@@ -83,6 +83,10 @@ enum SocialButtonVariant {
   iconAndText,
 }
 
+/// Client IDs used for native Google sign in on Android and iOS.
+///
+/// Google sign in is initialized once per app, so only the configuration
+/// used for the first native Google sign in takes effect.
 class NativeGoogleAuthConfig {
   const NativeGoogleAuthConfig({
     this.webClientId,
@@ -196,6 +200,9 @@ class SupaSocialsAuth extends StatefulWidget {
   State<SupaSocialsAuth> createState() => _SupaSocialsAuthState();
 }
 
+/// `GoogleSignIn.initialize` must only be called once per app.
+Future<void>? _googleSignInInitialization;
+
 class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
   late final StreamSubscription<AuthState> _gotrueSubscription;
 
@@ -205,10 +212,15 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
     required String? iosClientId,
   }) async {
     final GoogleSignIn googleSignIn = GoogleSignIn.instance;
-    await googleSignIn.initialize(
-      clientId: iosClientId,
-      serverClientId: webClientId,
-    );
+    try {
+      await (_googleSignInInitialization ??= googleSignIn.initialize(
+        clientId: iosClientId,
+        serverClientId: webClientId,
+      ));
+    } catch (_) {
+      _googleSignInInitialization = null;
+      rethrow;
+    }
 
     final googleUser = await googleSignIn.authenticate();
     final googleAuth = googleUser.authentication;
