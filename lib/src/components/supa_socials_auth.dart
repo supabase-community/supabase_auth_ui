@@ -80,6 +80,11 @@ enum SocialButtonVariant {
 }
 
 class NativeGoogleAuthConfig {
+  const NativeGoogleAuthConfig({
+    this.webClientId,
+    this.iosClientId,
+  });
+
   /// Web Client ID that you registered with Google Cloud.
   ///
   /// Required to perform native Google Sign In on Android
@@ -89,15 +94,29 @@ class NativeGoogleAuthConfig {
   ///
   /// Required to perform native Google Sign In on iOS
   final String? iosClientId;
-
-  const NativeGoogleAuthConfig({
-    this.webClientId,
-    this.iosClientId,
-  });
 }
 
 /// UI Component to create social login form
 class SupaSocialsAuth extends StatefulWidget {
+  const SupaSocialsAuth({
+    super.key,
+    this.nativeGoogleAuthConfig,
+    this.enableNativeAppleAuth = true,
+    required this.socialProviders,
+    this.colored = true,
+    this.redirectUrl,
+    required this.onSuccess,
+    this.onError,
+    this.socialButtonVariant = SocialButtonVariant.iconAndText,
+    this.spacing = 16.0,
+    this.showSnackBars = true,
+    this.showSuccessSnackBar = true,
+    this.scopes,
+    this.queryParams,
+    this.oAuthButtonLabels,
+    this.authScreenLaunchMode = LaunchMode.platformDefault,
+  });
+
   /// Defines native google provider to show in the form
   final NativeGoogleAuthConfig? nativeGoogleAuthConfig;
 
@@ -109,7 +128,8 @@ class SupaSocialsAuth extends StatefulWidget {
 
   /// Whether or not to color the social buttons in their respecful colors
   ///
-  /// You can control the appearance through `ElevatedButtonTheme` when set to false.
+  /// You can control the appearance through `ElevatedButtonTheme` when set
+  /// to false.
   final bool colored;
 
   /// Whether or not to show the icon only or icon and text
@@ -144,7 +164,8 @@ class SupaSocialsAuth extends StatefulWidget {
   /// OpenID scope(s) for provider authorization request (ex. '.default')
   final Map<OAuthProvider, String>? scopes;
 
-  /// Parameters to include in provider authorization request (ex. {'prompt': 'consent'})
+  /// Parameters to include in provider authorization request, for example
+  /// `{'prompt': 'consent'}`.
   final Map<OAuthProvider, Map<String, String>>? queryParams;
 
   /// Overrides the label shown on a provider's sign-in button.
@@ -166,25 +187,6 @@ class SupaSocialsAuth extends StatefulWidget {
 
   /// Custom LaunchMode support
   final LaunchMode authScreenLaunchMode;
-
-  const SupaSocialsAuth({
-    super.key,
-    this.nativeGoogleAuthConfig,
-    this.enableNativeAppleAuth = true,
-    required this.socialProviders,
-    this.colored = true,
-    this.redirectUrl,
-    required this.onSuccess,
-    this.onError,
-    this.socialButtonVariant = SocialButtonVariant.iconAndText,
-    this.spacing = 16.0,
-    this.showSnackBars = true,
-    this.showSuccessSnackBar = true,
-    this.scopes,
-    this.queryParams,
-    this.oAuthButtonLabels,
-    this.authScreenLaunchMode = LaunchMode.platformDefault,
-  });
 
   @override
   State<SupaSocialsAuth> createState() => _SupaSocialsAuthState();

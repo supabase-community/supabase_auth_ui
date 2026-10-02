@@ -8,6 +8,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// UI component to create password reset form
 class SupaResetPassword extends StatefulWidget {
+  const SupaResetPassword({
+    super.key,
+    this.accessToken,
+    this.showSnackBars = true,
+    required this.onSuccess,
+    this.onError,
+    this.enableAutomaticFormSubmission = true,
+  });
+
   /// accessToken of the user
   final String? accessToken;
 
@@ -28,15 +37,6 @@ class SupaResetPassword extends StatefulWidget {
   ///
   /// Defaults to `true` for backward compatibility.
   final bool enableAutomaticFormSubmission;
-
-  const SupaResetPassword({
-    super.key,
-    this.accessToken,
-    this.showSnackBars = true,
-    required this.onSuccess,
-    this.onError,
-    this.enableAutomaticFormSubmission = true,
-  });
 
   @override
   State<SupaResetPassword> createState() => _SupaResetPasswordState();

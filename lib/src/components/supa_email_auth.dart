@@ -10,7 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 ///
 /// You can use this object to create additional text fields that will be
 /// passed to the metadata of the user upon signup.
-/// For example, in order to create additional `username` field, you can use the following:
+/// For example, in order to create an additional `username` field, you can
+/// use the following:
 /// ```dart
 /// MetaDataField(label: 'Username', key: 'username')
 /// ```
@@ -22,6 +23,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// ```
 /// {@endtemplate}
 class MetaDataField {
+  /// {@macro metadata_field}
+  const MetaDataField({
+    required this.label,
+    required this.key,
+    this.validator,
+    this.prefixIcon,
+  });
+
   /// Label of the `TextFormField` for this metadata
   final String label;
 
@@ -33,14 +42,6 @@ class MetaDataField {
 
   /// Icon to show as the prefix icon in TextFormField
   final Icon? prefixIcon;
-
-  /// {@macro metadata_field}
-  const MetaDataField({
-    required this.label,
-    required this.key,
-    this.validator,
-    this.prefixIcon,
-  });
 }
 
 /// {@template boolean_metadata_field}
@@ -91,10 +92,26 @@ class MetaDataField {
 /// must check the checkbox in order to sign up.
 /// {@endtemplate}
 class BooleanMetaDataField extends MetaDataField {
+  /// {@macro boolean_metadata_field}
+  BooleanMetaDataField({
+    String? label,
+    this.value = false,
+    this.richLabelSpans,
+    this.checkboxSemanticLabel,
+    this.isRequired = false,
+    this.checkboxPosition = ListTileControlAffinity.platform,
+    required super.key,
+  }) : assert(
+         label != null || richLabelSpans != null,
+         'Either label or richLabelSpans must be provided',
+       ),
+       super(label: label ?? '');
+
   /// Whether the checkbox is initially checked.
   final bool value;
 
-  /// Rich text spans for the label. If provided, this will be used instead of [label].
+  /// Rich text spans for the label. If provided, this will be used instead
+  /// of [label].
   final List<InlineSpan>? richLabelSpans;
 
   /// Position of the checkbox in the [ListTile] created by this.
@@ -110,21 +127,6 @@ class BooleanMetaDataField extends MetaDataField {
 
   /// Semantic label for the checkbox.
   final String? checkboxSemanticLabel;
-
-  /// {@macro boolean_metadata_field}
-  BooleanMetaDataField({
-    String? label,
-    this.value = false,
-    this.richLabelSpans,
-    this.checkboxSemanticLabel,
-    this.isRequired = false,
-    this.checkboxPosition = ListTileControlAffinity.platform,
-    required super.key,
-  }) : assert(
-         label != null || richLabelSpans != null,
-         'Either label or richLabelSpans must be provided',
-       ),
-       super(label: label ?? '');
 
   Widget getLabelWidget(BuildContext context) {
     // This matches the default style of [TextField], to match the other fields
@@ -162,6 +164,33 @@ typedef MetadataController = Object;
 /// ```
 /// {@endtemplate}
 class SupaEmailAuth extends StatefulWidget {
+  /// {@macro supa_email_auth}
+  const SupaEmailAuth({
+    super.key,
+    this.autofocus = true,
+    this.redirectTo,
+    this.resetPasswordRedirectTo,
+    this.passwordValidator,
+    required this.onSignInComplete,
+    required this.onSignUpComplete,
+    this.onPasswordResetEmailSent,
+    this.onError,
+    this.onToggleSignIn,
+    this.onToggleRecoverPassword,
+    this.metadataFields,
+    this.extraMetadata,
+    this.isInitiallySigningIn = true,
+    this.prefixIconEmail = const Icon(Icons.email),
+    this.prefixIconPassword = const Icon(Icons.lock),
+    this.prefixIconOtp = const Icon(Icons.security),
+    this.showConfirmPasswordField = false,
+    this.showSnackBars = true,
+    this.useOtpForPasswordRecovery = false,
+    this.prefilledEmail,
+    this.prefilledPassword,
+    this.enableAutomaticFormSubmission = true,
+  });
+
   /// Whether the email field should automatically focus when the form is shown
   final bool autofocus;
 
@@ -246,33 +275,6 @@ class SupaEmailAuth extends StatefulWidget {
   ///
   /// Defaults to `true` for backward compatibility.
   final bool enableAutomaticFormSubmission;
-
-  /// {@macro supa_email_auth}
-  const SupaEmailAuth({
-    super.key,
-    this.autofocus = true,
-    this.redirectTo,
-    this.resetPasswordRedirectTo,
-    this.passwordValidator,
-    required this.onSignInComplete,
-    required this.onSignUpComplete,
-    this.onPasswordResetEmailSent,
-    this.onError,
-    this.onToggleSignIn,
-    this.onToggleRecoverPassword,
-    this.metadataFields,
-    this.extraMetadata,
-    this.isInitiallySigningIn = true,
-    this.prefixIconEmail = const Icon(Icons.email),
-    this.prefixIconPassword = const Icon(Icons.lock),
-    this.prefixIconOtp = const Icon(Icons.security),
-    this.showConfirmPasswordField = false,
-    this.showSnackBars = true,
-    this.useOtpForPasswordRecovery = false,
-    this.prefilledEmail,
-    this.prefilledPassword,
-    this.enableAutomaticFormSubmission = true,
-  });
 
   @override
   State<SupaEmailAuth> createState() => _SupaEmailAuthState();
