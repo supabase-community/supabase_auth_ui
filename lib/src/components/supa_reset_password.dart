@@ -62,10 +62,9 @@ class _SupaResetPasswordState extends State<SupaResetPassword> {
         UserAttributes(password: _password.text),
       );
       widget.onSuccess(response);
-      // FIX use_build_context_synchronously
       if (!mounted) return;
       if (widget.showSnackBars) {
-        context.showSnackBar(localization.passwordResetSent);
+        context.showSnackBar(localization.passwordChangedSuccess);
       }
     } catch (error) {
       if (!mounted) return;
@@ -74,7 +73,7 @@ class _SupaResetPasswordState extends State<SupaResetPassword> {
         error,
         onError: widget.onError,
         showSnackBars: widget.showSnackBars,
-        unexpectedErrorText: localization.passwordLengthError,
+        unexpectedErrorText: localization.unexpectedError,
       );
     }
   }

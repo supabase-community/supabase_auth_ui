@@ -58,7 +58,7 @@ void main() {
     expect(response, isNotNull);
     expect(testServer.lastRequest!.method, 'PUT');
     expect(testServer.lastRequest!.url.path, endsWith('/user'));
-    expect(find.text('Password reset email has been sent'), findsOneWidget);
+    expect(find.text('Password successfully updated'), findsOneWidget);
   });
 
   testWidgets('forwards an error to onError when the update fails', (
