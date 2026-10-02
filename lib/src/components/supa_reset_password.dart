@@ -18,6 +18,10 @@ class SupaResetPassword extends StatefulWidget {
   });
 
   /// accessToken of the user
+  @Deprecated(
+    'Has no effect. The password is updated for the signed in user, so this '
+    'will be removed in a future version.',
+  )
   final String? accessToken;
 
   /// Whether to show snack bars
