@@ -430,7 +430,16 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
               authScreenLaunchMode: widget.authScreenLaunchMode,
             );
           } catch (error) {
-            if (context.mounted) {
+            final isCanceled = switch (error) {
+              GoogleSignInException(
+                code: GoogleSignInExceptionCode.canceled,
+              ) ||
+              SignInWithAppleAuthorizationException(
+                code: AuthorizationErrorCode.canceled,
+              ) => true,
+              _ => false,
+            };
+            if (!isCanceled && context.mounted) {
               handleAuthError(
                 context,
                 error,
