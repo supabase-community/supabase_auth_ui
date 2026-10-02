@@ -75,4 +75,25 @@ void main() {
 
     expect(find.text('Rate limit exceeded'), findsOneWidget);
   });
+
+  testWidgets('calls onSuccess on sign in but not on later user updates', (
+    tester,
+  ) async {
+    final sessions = <Session>[];
+    await tester.pumpWidget(buildForm(onSuccess: sessions.add));
+
+    await tester.runAsync(() async {
+      await Supabase.instance.client.auth.signInWithPassword(
+        email: 'magic@example.com',
+        password: 'password',
+      );
+      testServer.responder = (_) => userResponse();
+      await Supabase.instance.client.auth.updateUser(
+        UserAttributes(data: {'name': 'Magic'}),
+      );
+    });
+    await tester.pumpAndSettle();
+
+    expect(sessions, hasLength(1));
+  });
 }
