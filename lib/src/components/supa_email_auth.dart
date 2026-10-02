@@ -778,7 +778,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
       }
 
       await supabase.auth.updateUser(
-        UserAttributes(password: _newPasswordController.text),
+        UserAttributes(password: _newPasswordController.text.trim()),
       );
 
       if (!mounted) return;

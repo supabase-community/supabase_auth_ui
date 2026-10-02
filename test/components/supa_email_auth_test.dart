@@ -378,5 +378,41 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('trims the new password set through the OTP flow', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildForm(useOtpForPasswordRecovery: true));
+
+      await tester.tap(find.text('Forgot your password?'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'reset@example.com',
+      );
+      await tester.tap(
+        find.widgetWithText(ElevatedButton, 'Send password reset email'),
+      );
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Enter OTP code'),
+        '123456',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Enter new password'),
+        ' newpassword ',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Confirm Password'),
+        ' newpassword ',
+      );
+      await tester.tap(
+        find.widgetWithText(ElevatedButton, 'Change Password'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(testServer.lastRequest!.url.path, endsWith('/user'));
+      expect(testServer.lastBody['password'], 'newpassword');
+    });
   });
 }

@@ -59,7 +59,7 @@ class _SupaResetPasswordState extends State<SupaResetPassword> {
     }
     try {
       final response = await supabase.auth.updateUser(
-        UserAttributes(password: _password.text),
+        UserAttributes(password: _password.text.trim()),
       );
       widget.onSuccess(response);
       if (!mounted) return;
