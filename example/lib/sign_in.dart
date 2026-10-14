@@ -149,7 +149,8 @@ class _SignUpState extends State<SignUp> {
                     ),
                     BooleanMetaDataField(
                       label:
-                          'Keep me up to date with the latest news and updates.',
+                          'Keep me up to date with the latest news and '
+                          'updates.',
                       key: 'marketing_consent',
                       checkboxPosition: ListTileControlAffinity.leading,
                     ),

@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 
 /// Internal password field with a visibility toggle.
 class SupaPasswordField extends StatefulWidget {
-  final TextEditingController controller;
-  final String labelText;
-  final String? Function(String?)? validator;
-  final Widget? prefixIcon;
-  final Iterable<String>? autofillHints;
-  final TextInputAction? textInputAction;
-  final void Function(String)? onFieldSubmitted;
-  final AutovalidateMode? autovalidateMode;
-
   const SupaPasswordField({
     super.key,
     required this.controller,
@@ -22,6 +13,15 @@ class SupaPasswordField extends StatefulWidget {
     this.onFieldSubmitted,
     this.autovalidateMode,
   });
+
+  final TextEditingController controller;
+  final String labelText;
+  final String? Function(String?)? validator;
+  final Widget? prefixIcon;
+  final Iterable<String>? autofillHints;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
+  final AutovalidateMode? autovalidateMode;
 
   @override
   State<SupaPasswordField> createState() => _SupaPasswordFieldState();

@@ -7,6 +7,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// UI component for verifying phone number
 class SupaVerifyPhone extends StatefulWidget {
+  const SupaVerifyPhone({
+    super.key,
+    required this.onSuccess,
+    this.onError,
+    this.showSnackBars = true,
+  });
+
   /// Method to be called when the auth action is success
   final void Function(AuthResponse response) onSuccess;
 
@@ -15,13 +22,6 @@ class SupaVerifyPhone extends StatefulWidget {
 
   /// Whether to show snack bars
   final bool showSnackBars;
-
-  const SupaVerifyPhone({
-    super.key,
-    required this.onSuccess,
-    this.onError,
-    this.showSnackBars = true,
-  });
 
   @override
   State<SupaVerifyPhone> createState() => _SupaVerifyPhoneState();
@@ -44,10 +44,13 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
       return;
     }
     try {
+      // SupaPhoneAuth adds a phone number to an anonymous user through
+      // updateUser, which sends a phone change code instead of a sign up code.
+      final isAnonymous = supabase.auth.currentUser?.isAnonymous ?? false;
       final response = await supabase.auth.verifyOTP(
         phone: data!['phone'],
         token: _code.text,
-        type: OtpType.sms,
+        type: isAnonymous ? OtpType.phoneChange : OtpType.sms,
       );
       widget.onSuccess(response);
     } catch (error) {

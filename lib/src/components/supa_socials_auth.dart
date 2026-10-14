@@ -27,7 +27,8 @@ extension on OAuthProvider {
     OAuthProvider.slack || OAuthProvider.slackOidc => FontAwesomeIcons.slack,
     OAuthProvider.spotify => FontAwesomeIcons.spotify,
     OAuthProvider.twitch => FontAwesomeIcons.twitch,
-    OAuthProvider.twitter => FontAwesomeIcons.xTwitter,
+    OAuthProvider.twitter || OAuthProvider.x => FontAwesomeIcons.xTwitter,
+    OAuthProvider.zoom => FontAwesomeIcons.zoom,
     _ => FontAwesomeIcons.xmark,
   };
 
@@ -49,13 +50,16 @@ extension on OAuthProvider {
     OAuthProvider.spotify => Colors.green,
     OAuthProvider.twitch => Colors.purpleAccent,
     OAuthProvider.workos => const Color.fromRGBO(99, 99, 241, 1),
+    OAuthProvider.zoom => const Color(0xFF0B5CFF),
     _ => Colors.black,
   };
 
   /// Human readable provider name, e.g. `Github` or `Linkedin`, used to build
   /// the localized "Continue with ..." button label.
   String get displayName {
-    final modifiedName = name.replaceAll('Oidc', '');
+    final modifiedName = name
+        .replaceFirst('custom:', '')
+        .replaceAll('_oidc', '');
     return '${modifiedName[0].toUpperCase()}${modifiedName.substring(1)}';
   }
 
@@ -79,7 +83,16 @@ enum SocialButtonVariant {
   iconAndText,
 }
 
+/// Client IDs used for native Google sign in on Android and iOS.
+///
+/// Google sign in is initialized once per app, so only the configuration
+/// used for the first native Google sign in takes effect.
 class NativeGoogleAuthConfig {
+  const NativeGoogleAuthConfig({
+    this.webClientId,
+    this.iosClientId,
+  });
+
   /// Web Client ID that you registered with Google Cloud.
   ///
   /// Required to perform native Google Sign In on Android
@@ -89,15 +102,29 @@ class NativeGoogleAuthConfig {
   ///
   /// Required to perform native Google Sign In on iOS
   final String? iosClientId;
-
-  const NativeGoogleAuthConfig({
-    this.webClientId,
-    this.iosClientId,
-  });
 }
 
 /// UI Component to create social login form
 class SupaSocialsAuth extends StatefulWidget {
+  const SupaSocialsAuth({
+    super.key,
+    this.nativeGoogleAuthConfig,
+    this.enableNativeAppleAuth = true,
+    required this.socialProviders,
+    this.colored = true,
+    this.redirectUrl,
+    required this.onSuccess,
+    this.onError,
+    this.socialButtonVariant = SocialButtonVariant.iconAndText,
+    this.spacing = 16.0,
+    this.showSnackBars = true,
+    this.showSuccessSnackBar = true,
+    this.scopes,
+    this.queryParams,
+    this.oAuthButtonLabels,
+    this.authScreenLaunchMode = LaunchMode.platformDefault,
+  });
+
   /// Defines native google provider to show in the form
   final NativeGoogleAuthConfig? nativeGoogleAuthConfig;
 
@@ -109,7 +136,8 @@ class SupaSocialsAuth extends StatefulWidget {
 
   /// Whether or not to color the social buttons in their respecful colors
   ///
-  /// You can control the appearance through `ElevatedButtonTheme` when set to false.
+  /// You can control the appearance through `ElevatedButtonTheme` when set
+  /// to false.
   final bool colored;
 
   /// Whether or not to show the icon only or icon and text
@@ -144,7 +172,8 @@ class SupaSocialsAuth extends StatefulWidget {
   /// OpenID scope(s) for provider authorization request (ex. '.default')
   final Map<OAuthProvider, String>? scopes;
 
-  /// Parameters to include in provider authorization request (ex. {'prompt': 'consent'})
+  /// Parameters to include in provider authorization request, for example
+  /// `{'prompt': 'consent'}`.
   final Map<OAuthProvider, Map<String, String>>? queryParams;
 
   /// Overrides the label shown on a provider's sign-in button.
@@ -167,28 +196,12 @@ class SupaSocialsAuth extends StatefulWidget {
   /// Custom LaunchMode support
   final LaunchMode authScreenLaunchMode;
 
-  const SupaSocialsAuth({
-    super.key,
-    this.nativeGoogleAuthConfig,
-    this.enableNativeAppleAuth = true,
-    required this.socialProviders,
-    this.colored = true,
-    this.redirectUrl,
-    required this.onSuccess,
-    this.onError,
-    this.socialButtonVariant = SocialButtonVariant.iconAndText,
-    this.spacing = 16.0,
-    this.showSnackBars = true,
-    this.showSuccessSnackBar = true,
-    this.scopes,
-    this.queryParams,
-    this.oAuthButtonLabels,
-    this.authScreenLaunchMode = LaunchMode.platformDefault,
-  });
-
   @override
   State<SupaSocialsAuth> createState() => _SupaSocialsAuthState();
 }
+
+/// `GoogleSignIn.initialize` must only be called once per app.
+Future<void>? _googleSignInInitialization;
 
 class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
   late final StreamSubscription<AuthState> _gotrueSubscription;
@@ -199,10 +212,15 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
     required String? iosClientId,
   }) async {
     final GoogleSignIn googleSignIn = GoogleSignIn.instance;
-    await googleSignIn.initialize(
-      clientId: iosClientId,
-      serverClientId: webClientId,
-    );
+    try {
+      await (_googleSignInInitialization ??= googleSignIn.initialize(
+        clientId: iosClientId,
+        serverClientId: webClientId,
+      ));
+    } catch (_) {
+      _googleSignInInitialization = null;
+      rethrow;
+    }
 
     final googleUser = await googleSignIn.authenticate();
     final googleAuth = googleUser.authentication;
@@ -289,7 +307,13 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
               context.showSnackBar(context.l10n.successSignInMessage);
             }
           }
-        });
+        }, onError: _onAuthStateError);
+  }
+
+  void _onAuthStateError(Object error) {
+    if (mounted) {
+      widget.onError?.call(error);
+    }
   }
 
   @override
@@ -399,6 +423,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
                 redirectTo: widget.redirectUrl,
                 scopes: widget.scopes?[socialProvider],
                 queryParams: widget.queryParams?[socialProvider],
+                authScreenLaunchMode: widget.authScreenLaunchMode,
               );
               return;
             }
@@ -411,7 +436,16 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
               authScreenLaunchMode: widget.authScreenLaunchMode,
             );
           } catch (error) {
-            if (context.mounted) {
+            final isCanceled = switch (error) {
+              GoogleSignInException(
+                code: GoogleSignInExceptionCode.canceled,
+              ) ||
+              SignInWithAppleAuthorizationException(
+                code: AuthorizationErrorCode.canceled,
+              ) => true,
+              _ => false,
+            };
+            if (!isCanceled && context.mounted) {
               handleAuthError(
                 context,
                 error,

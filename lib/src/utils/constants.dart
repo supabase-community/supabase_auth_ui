@@ -24,8 +24,9 @@ String? Function(String?) defaultPasswordValidator(String lengthError) {
 /// Handles an error thrown by an auth action in the same way across all forms.
 ///
 /// Calls [onError] when provided, otherwise shows an error snack bar (when
-/// [showSnackBars] is `true` and the [context] is still mounted). [AuthException]s
-/// show their message, while any other error is prefixed with [unexpectedErrorText].
+/// [showSnackBars] is `true` and the [context] is still mounted).
+/// [AuthException]s show their message, while any other error is prefixed
+/// with [unexpectedErrorText].
 void handleAuthError(
   BuildContext context,
   Object error, {

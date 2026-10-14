@@ -8,7 +8,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// UI component to create password reset form
 class SupaResetPassword extends StatefulWidget {
+  const SupaResetPassword({
+    super.key,
+    this.accessToken,
+    this.showSnackBars = true,
+    required this.onSuccess,
+    this.onError,
+    this.enableAutomaticFormSubmission = true,
+  });
+
   /// accessToken of the user
+  @Deprecated(
+    'Has no effect. The password is updated for the signed in user, so this '
+    'will be removed in a future version.',
+  )
   final String? accessToken;
 
   /// Whether to show snack bars
@@ -28,15 +41,6 @@ class SupaResetPassword extends StatefulWidget {
   ///
   /// Defaults to `true` for backward compatibility.
   final bool enableAutomaticFormSubmission;
-
-  const SupaResetPassword({
-    super.key,
-    this.accessToken,
-    this.showSnackBars = true,
-    required this.onSuccess,
-    this.onError,
-    this.enableAutomaticFormSubmission = true,
-  });
 
   @override
   State<SupaResetPassword> createState() => _SupaResetPasswordState();
@@ -59,13 +63,12 @@ class _SupaResetPasswordState extends State<SupaResetPassword> {
     }
     try {
       final response = await supabase.auth.updateUser(
-        UserAttributes(password: _password.text),
+        UserAttributes(password: _password.text.trim()),
       );
       widget.onSuccess(response);
-      // FIX use_build_context_synchronously
       if (!mounted) return;
       if (widget.showSnackBars) {
-        context.showSnackBar(localization.passwordResetSent);
+        context.showSnackBar(localization.passwordChangedSuccess);
       }
     } catch (error) {
       if (!mounted) return;
@@ -74,7 +77,7 @@ class _SupaResetPasswordState extends State<SupaResetPassword> {
         error,
         onError: widget.onError,
         showSnackBars: widget.showSnackBars,
-        unexpectedErrorText: localization.passwordLengthError,
+        unexpectedErrorText: localization.unexpectedError,
       );
     }
   }

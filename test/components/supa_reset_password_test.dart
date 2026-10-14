@@ -51,14 +51,15 @@ void main() {
     UserResponse? response;
     await tester.pumpWidget(buildForm(onSuccess: (r) => response = r));
 
-    await tester.enterText(find.byType(TextFormField), 'newpassword');
+    await tester.enterText(find.byType(TextFormField), ' newpassword ');
     await tester.tap(find.widgetWithText(ElevatedButton, 'Update Password'));
     await tester.pumpAndSettle();
 
     expect(response, isNotNull);
+    expect(testServer.lastBody['password'], 'newpassword');
     expect(testServer.lastRequest!.method, 'PUT');
     expect(testServer.lastRequest!.url.path, endsWith('/user'));
-    expect(find.text('Password reset email has been sent'), findsOneWidget);
+    expect(find.text('Password successfully updated'), findsOneWidget);
   });
 
   testWidgets('forwards an error to onError when the update fails', (
