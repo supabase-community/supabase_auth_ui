@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-10-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`supabase_auth_ui` - `v0.7.1`](#supabase_auth_ui---v071)
+
+---
+
+#### `supabase_auth_ui` - `v0.7.1`
+
+ - **FEAT**: modernize supabase_auth_ui on the latest supabase_flutter v2 ([#179](https://github.com/supabase-community/supabase_auth_ui/issues/179)).
+
+## 0.7.1
+
+ - **FEAT**: modernize supabase_auth_ui on the latest supabase_flutter v2 ([#179](https://github.com/supabase-community/supabase_auth_ui/issues/179)).
+
+
 ## 2026-07-16
 
 ### Changes
