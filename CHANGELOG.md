@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-10-20
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`supabase_auth_ui` - `v0.7.2`](#supabase_auth_ui---v072)
+
+---
+
+#### `supabase_auth_ui` - `v0.7.2`
+
+ - **FIX**: make supabase_auth_ui WASM compatible ([#181](https://github.com/supabase-community/supabase_auth_ui/issues/181)).
+
+## 0.7.2
+
+ - **FIX**: make supabase_auth_ui WASM compatible ([#181](https://github.com/supabase-community/supabase_auth_ui/issues/181)).
+
+
 ## 2026-10-14
 
 ### Changes
