@@ -6,9 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_auth_ui/src/l10n/l10n_extension.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
+import 'package:supabase_auth_ui/src/utils/native_apple_sign_in_stub.dart'
+    if (dart.library.io) 'package:supabase_auth_ui/src/utils/native_apple_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 extension on OAuthProvider {
@@ -243,13 +244,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
     final rawNonce = supabase.auth.generateRawNonce();
     final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
-    final credential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: hashedNonce,
-    );
+    final credential = await getNativeAppleCredential(nonce: hashedNonce);
 
     final idToken = credential.identityToken;
     if (idToken == null) {
@@ -436,15 +431,10 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
               authScreenLaunchMode: widget.authScreenLaunchMode,
             );
           } catch (error) {
-            final isCanceled = switch (error) {
-              GoogleSignInException(
-                code: GoogleSignInExceptionCode.canceled,
-              ) ||
-              SignInWithAppleAuthorizationException(
-                code: AuthorizationErrorCode.canceled,
-              ) => true,
-              _ => false,
-            };
+            final isCanceled =
+                (error is GoogleSignInException &&
+                    error.code == GoogleSignInExceptionCode.canceled) ||
+                isNativeAppleSignInCanceled(error);
             if (!isCanceled && context.mounted) {
               handleAuthError(
                 context,
